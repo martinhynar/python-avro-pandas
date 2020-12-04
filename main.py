@@ -29,8 +29,9 @@ class AvroWriter:
 
 
 class AvroReader:
-    def __init__(self, avro_data_file):
-        self.avro_reader = DataFileReader(open(avro_data_file, "rb"), DatumReader())
+    def __init__(self, data_file):
+        self.avro_reader = DataFileReader(open(data_file, "rb"),
+                                          DatumReader())
 
     def print(self):
         # There is schema available in meta field
@@ -40,8 +41,10 @@ class AvroReader:
         # Or load it into json
         schema_json = json.loads(self.avro_reader.meta.get('avro.schema').decode('utf-8'))
         print('Avro schema [{}]: {}.{}'.format(schema_json['type'], schema_json['namespace'], schema_json['name']))
+
         for field in schema_json['fields']:
-            print('Field {}:{}'.format(field['name'], field['type']))
+            print('{}:{}'.format(field['name'], field['type']))
+
         records = [record for record in self.avro_reader]
         print("---- AVRO RECORDS ----")
         print(records)
@@ -50,6 +53,7 @@ class AvroReader:
 
 
 if __name__ == '__main__':
+    # Execiting this will create sample avro data file and the read it back
     schema_path = './sample.avsc'
     data_path = './sample.avro'
     avro_writer = AvroWriter(schema_path, data_path)
