@@ -1,8 +1,8 @@
 from pandas import DataFrame
 from avro.schema import parse
-import json
 from avro.datafile import DataFileReader, DataFileWriter
 from avro.io import DatumReader, DatumWriter
+import json
 
 
 class AvroWriter:
@@ -13,7 +13,7 @@ class AvroWriter:
     def write_sample(self):
         with DataFileWriter(open(self.avro_data_file, "wb"),
                             DatumWriter(),
-                            self.schema) as writer:
+                            self.schema, codec="deflate") as writer:
             writer.append({'name': 'Prague',
                            "year": 2020,
                            "population": 1324277,
@@ -38,10 +38,13 @@ class AvroReader:
         print("---- SCHEMA ----")
         # Print schema as dict
         print(self.avro_reader.meta)
+
         # Or load it into json
         schema_json = json.loads(self.avro_reader.meta.get('avro.schema').decode('utf-8'))
         print('Avro schema [{}]: {}.{}'.format(schema_json['type'], schema_json['namespace'], schema_json['name']))
 
+        print("---- CODEC ----")
+        print(self.avro_reader.meta.get('avro.codec'))
         for field in schema_json['fields']:
             print('{}:{}'.format(field['name'], field['type']))
 
